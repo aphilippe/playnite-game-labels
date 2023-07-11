@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameLabels.cs" />
+    <Compile Include="GameLabelsContainer.xaml.cs">
+      <DependentUpon>GameLabelsContainer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GameLabelsSettings.cs" />
     <Compile Include="GameLabelsSettingsView.xaml.cs">
       <DependentUpon>GameLabelsSettingsView.xaml</DependentUpon>
@@ -70,6 +73,10 @@
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="GameLabelsContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GameLabelsSettingsView.xaml">
       <SubType>Designer</SubType>

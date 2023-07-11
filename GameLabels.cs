@@ -26,6 +26,12 @@ namespace GameLabels
             {
                 HasSettings = true
             };
+
+            AddCustomElementSupport(new AddCustomElementSupportArgs
+            {
+                ElementList = new List<string> { "GameLabelsContainer" },
+                SourceName = "GameLabels"
+            });
         }
 
         public override void OnGameInstalled(OnGameInstalledEventArgs args)
@@ -76,6 +82,13 @@ namespace GameLabels
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
             return new GameLabelsSettingsView();
+        }
+
+        public override Control GetGameViewControl(GetGameViewControlArgs args)
+        {
+            if (args.Name == "GameLabelsContainer") return new GameLabelsContainer();
+
+            return null;
         }
     }
 }
