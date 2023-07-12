@@ -5,11 +5,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace GameLabels
 {
     public class GameLabelsSettings : ObservableObject
     {
+        private ICollection<GameLabel> labels = new List<GameLabel> {
+            new GameLabel { Text = "DEMO", BackgroundColor = new SolidColorBrush(Color.FromRgb(0xae, 0xd7, 0x7c)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
+            new GameLabel { Text = "DLC", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x9d, 0x51, 0xaa)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
+            new GameLabel { Text = "EARLYBAYE", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x3c, 0x6d, 0x9d)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
+        };
+
+        [DontSerialize]
+        public ICollection<GameLabel> Labels { get => labels; set => SetValue(ref labels, value); } 
+
         private string option1 = string.Empty;
         private bool option2 = false;
         private bool optionThatWontBeSaved = false;

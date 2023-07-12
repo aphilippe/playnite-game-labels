@@ -86,7 +86,7 @@ namespace GameLabels
 
         public override Control GetGameViewControl(GetGameViewControlArgs args)
         {
-            if (args.Name == "GameLabelsContainer") return new GameLabelsContainer();
+            if (args.Name == "GameLabelsContainer") return new GameLabelsContainer(settings);
 
             return null;
         }

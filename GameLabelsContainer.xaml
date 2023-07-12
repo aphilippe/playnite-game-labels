@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:GameLabels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-              xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <ItemsControl>
+              xmlns:sys="clr-namespace:System;assembly=mscorlib" d:DataContext="{d:DesignInstance Type=local:GameLabelsContainer}">
+    <ItemsControl x:Name="Control" ItemsSource="{Binding Labels}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <VirtualizingStackPanel Orientation="Vertical" />
@@ -22,12 +22,12 @@
                 </Border>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
-        <ItemsControl.ItemsSource>
+        <!--<ItemsControl.ItemsSource>
             <x:Array Type="{x:Type local:GameLabel}">
                 <local:GameLabel Text="DEMO" BackgroundColor="#aed77c" TextColor="Black" />
                 <local:GameLabel Text="DLC" BackgroundColor="#9d51aa" TextColor="Black" />
                 <local:GameLabel Text="EARLY" BackgroundColor="#3c6d9d" TextColor="Black" />
             </x:Array>
-        </ItemsControl.ItemsSource>
+        </ItemsControl.ItemsSource>-->
     </ItemsControl>
 </PluginUserControl>
