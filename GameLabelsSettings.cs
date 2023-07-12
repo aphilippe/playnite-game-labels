@@ -2,6 +2,7 @@
 using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,14 +12,14 @@ namespace GameLabels
 {
     public class GameLabelsSettings : ObservableObject
     {
-        private ICollection<GameLabel> labels = new List<GameLabel> {
+        private ObservableCollection<GameLabel> labels = new ObservableCollection<GameLabel> {
             new GameLabel { Text = "DEMO", BackgroundColor = new SolidColorBrush(Color.FromRgb(0xae, 0xd7, 0x7c)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
             new GameLabel { Text = "DLC", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x9d, 0x51, 0xaa)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
             new GameLabel { Text = "EARLYBAYE", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x3c, 0x6d, 0x9d)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
         };
 
         [DontSerialize]
-        public ICollection<GameLabel> Labels { get => labels; set => SetValue(ref labels, value); } 
+        public ObservableCollection<GameLabel> Labels { get => labels; set => SetValue(ref labels, value); } 
 
         private string option1 = string.Empty;
         private bool option2 = false;
@@ -48,6 +49,8 @@ namespace GameLabels
             }
         }
 
+        public RelayCommand AddLabelCommand { get; }
+
         public GameLabelsSettingsViewModel(GameLabels plugin)
         {
             // Injecting your plugin instance is required for Save/Load method because Playnite saves data to a location based on what plugin requested the operation.
@@ -65,6 +68,11 @@ namespace GameLabels
             {
                 Settings = new GameLabelsSettings();
             }
+
+            AddLabelCommand = new RelayCommand( () => 
+            { 
+                Settings.Labels.Add(new GameLabel { Text = "New", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x0, 0x0, 0x0)), TextColor = new SolidColorBrush(Color.FromRgb(255, 255, 255)) }); 
+            } );
         }
 
         public void BeginEdit()
