@@ -50,6 +50,7 @@ namespace GameLabels
         }
 
         public RelayCommand AddLabelCommand { get; }
+        public RelayCommand<GameLabel> DeleteLabelCommand { get; }
 
         public GameLabelsSettingsViewModel(GameLabels plugin)
         {
@@ -73,6 +74,11 @@ namespace GameLabels
             { 
                 Settings.Labels.Add(new GameLabel { Text = "New", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x0, 0x0, 0x0)), TextColor = new SolidColorBrush(Color.FromRgb(255, 255, 255)) }); 
             } );
+
+            DeleteLabelCommand = new RelayCommand<GameLabel>(label =>
+            {
+                Settings.Labels.Remove(label);
+            });
         }
 
         public void BeginEdit()

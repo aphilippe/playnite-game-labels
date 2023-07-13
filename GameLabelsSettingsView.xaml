@@ -14,8 +14,12 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Text}" Background="{Binding BackgroundColor}" Foreground="{Binding TextColor}" 
-                                FontWeight="Bold"/>
+                    <Grid>
+                        <TextBlock Text="{Binding Text}" Background="{Binding BackgroundColor}" Foreground="{Binding TextColor}" 
+                                    FontWeight="Bold"/>
+                        <Button Content="X" HorizontalAlignment="Right"
+                                Command="{Binding DataContext.DeleteLabelCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" />
+                    </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
