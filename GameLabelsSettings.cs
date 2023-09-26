@@ -1,11 +1,15 @@
-﻿using Playnite.SDK;
+﻿using GameLabels.Conditions;
+using GameLabels.Settings;
+using Playnite.SDK;
 using Playnite.SDK.Data;
+using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace GameLabels
@@ -13,9 +17,9 @@ namespace GameLabels
     public class GameLabelsSettings : ObservableObject
     {
         private ObservableCollection<GameLabel> labels = new ObservableCollection<GameLabel> {
-            new GameLabel { Text = "DEMO", BackgroundColor = new SolidColorBrush(Color.FromRgb(0xae, 0xd7, 0x7c)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
-            new GameLabel { Text = "DLC", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x9d, 0x51, 0xaa)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
-            new GameLabel { Text = "EARLYBAYE", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x3c, 0x6d, 0x9d)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)) },
+            new GameLabel { Text = "DEMO", BackgroundColor = new SolidColorBrush(Color.FromRgb(0xae, 0xd7, 0x7c)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)), Condition = new AlwaysFalseGameLabelCondition() },
+            new GameLabel { Text = "DLC", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x9d, 0x51, 0xaa)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)), Condition = new AlwaysTrueGameLabelCondition() },
+            new GameLabel { Text = "EARLYBAYE", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x3c, 0x6d, 0x9d)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)), Condition = new AlwaysFalseGameLabelCondition() },
         };
 
         [DontSerialize]
@@ -49,8 +53,19 @@ namespace GameLabels
             }
         }
 
+        private ObservableCollection<GameLabelSettingsViewModel> labels;
+        public ObservableCollection<GameLabelSettingsViewModel> Labels
+        {
+            get => labels;
+            set
+            {
+                labels = value;
+                OnPropertyChanged();
+            }
+        }
+
         public RelayCommand AddLabelCommand { get; }
-        public RelayCommand<GameLabel> DeleteLabelCommand { get; }
+        public RelayCommand<GameLabelSettingsViewModel> DeleteLabelCommand { get; }
 
         public GameLabelsSettingsViewModel(GameLabels plugin)
         {
@@ -70,14 +85,22 @@ namespace GameLabels
                 Settings = new GameLabelsSettings();
             }
 
+            Labels = settings.Labels.Select(label => new GameLabelSettingsViewModel(label, plugin.PlayniteApi)).ToObservable();
+
             AddLabelCommand = new RelayCommand( () => 
-            { 
-                Settings.Labels.Add(new GameLabel { Text = "New", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x0, 0x0, 0x0)), TextColor = new SolidColorBrush(Color.FromRgb(255, 255, 255)) }); 
+            {
+                var label = new GameLabel {
+                    Text = "New",
+                    BackgroundColor = new SolidColorBrush(Color.FromRgb(0x0, 0x0, 0x0)),
+                    TextColor = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
+                    Condition = new AlwaysTrueGameLabelCondition()
+                }; 
+                Labels.Add(new GameLabelSettingsViewModel(label, plugin.PlayniteApi));
             } );
 
-            DeleteLabelCommand = new RelayCommand<GameLabel>(label =>
+            DeleteLabelCommand = new RelayCommand<GameLabelSettingsViewModel>(label =>
             {
-                Settings.Labels.Remove(label);
+                Labels.Remove(label);
             });
         }
 
@@ -98,6 +121,9 @@ namespace GameLabels
         {
             // Code executed when user decides to confirm changes made since BeginEdit was called.
             // This method should save settings made to Option1 and Option2.
+
+            Settings.Labels = Labels.Select(x => x.GetLabel()).ToObservable();
+
             plugin.SavePluginSettings(Settings);
         }
 

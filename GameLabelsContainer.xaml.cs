@@ -49,7 +49,7 @@ namespace GameLabels
 
         private void UpdateLabels()
         {
-            Labels = _settings.Settings.Labels;
+            Labels = _settings.Settings.Labels.Where(x => x.Condition.Test(GameContext));
         }
 
         #region Events

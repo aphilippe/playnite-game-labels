@@ -22,4 +22,9 @@ namespace GameLabels
             InitializeComponent();
         }
     }
+
+    public class LabelViewModel
+    {
+
+    }
 }
