@@ -48,7 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Conditions\ContainTagGameLabelCondition.cs" />
+    <Compile Include="Conditions\GuidGameLabelCondition.cs" />
     <Compile Include="Conditions\IGameLabelCondition.cs" />
     <Compile Include="GameLabel.cs" />
     <Compile Include="GameLabels.cs" />
