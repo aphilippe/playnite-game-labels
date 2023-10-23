@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -16,25 +18,19 @@ namespace GameLabels
 {
     public class GameLabelsSettings : ObservableObject
     {
-        private ObservableCollection<GameLabel> labels = new ObservableCollection<GameLabel> {
-            new GameLabel { Text = "DEMO", BackgroundColor = new SolidColorBrush(Color.FromRgb(0xae, 0xd7, 0x7c)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)), Condition = new AlwaysFalseGameLabelCondition() },
-            new GameLabel { Text = "DLC", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x9d, 0x51, 0xaa)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)), Condition = new AlwaysTrueGameLabelCondition() },
-            new GameLabel { Text = "EARLYBAYE", BackgroundColor = new SolidColorBrush(Color.FromRgb(0x3c, 0x6d, 0x9d)), TextColor = new SolidColorBrush(Color.FromRgb(0, 0, 0)), Condition = new AlwaysFalseGameLabelCondition() },
-        };
+        private ObservableCollection<GameLabel> labels = new ObservableCollection<GameLabel>();
 
         [DontSerialize]
         public ObservableCollection<GameLabel> Labels { get => labels; set => SetValue(ref labels, value); } 
+    }
 
-        private string option1 = string.Empty;
-        private bool option2 = false;
-        private bool optionThatWontBeSaved = false;
-
-        public string Option1 { get => option1; set => SetValue(ref option1, value); }
-        public bool Option2 { get => option2; set => SetValue(ref option2, value); }
-        // Playnite serializes settings object to a JSON object and saves it as text file.
-        // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
-        [DontSerialize]
-        public bool OptionThatWontBeSaved { get => optionThatWontBeSaved; set => SetValue(ref optionThatWontBeSaved, value); }
+    internal class SeriazableGameLabel
+    {
+        public string Text { get; set; }
+        public Brush BackgroundColor { get; set; }
+        public Brush TextColor { get; set; }
+        public string ConditionSerializerName { get; set; }
+        public Dictionary<string, object> ConditionArguments { get; set; }
     }
 
     public class GameLabelsSettingsViewModel : ObservableObject, ISettings
@@ -71,19 +67,28 @@ namespace GameLabels
         {
             // Injecting your plugin instance is required for Save/Load method because Playnite saves data to a location based on what plugin requested the operation.
             this.plugin = plugin;
+            
+            Settings = new GameLabelsSettings();
 
-            // Load saved settings.
-            var savedSettings = plugin.LoadPluginSettings<GameLabelsSettings>();
+            try
+            {
+                // Load saved settings.
+                var savedSettings = plugin.LoadPluginSettings<IEnumerable<SeriazableGameLabel>>();
 
-            // LoadPluginSettings returns null if no saved data is available.
-            if (savedSettings != null)
-            {
-                Settings = savedSettings;
+                // LoadPluginSettings returns null if no saved data is available.
+                if (savedSettings != null)
+                {
+                    Settings.Labels = savedSettings.Select(x =>
+                    {
+                        var objectHandle = Activator.CreateInstance(null, x.ConditionSerializerName);
+                        var conditionSerializer = (IGameLabelConditionSerializer)objectHandle.Unwrap();
+
+                        var condition = conditionSerializer.Deserialize(x.ConditionArguments);
+                        return new GameLabel(x.Text, x.BackgroundColor, x.TextColor, condition);
+                    }).ToObservable();
+                }
             }
-            else
-            {
-                Settings = new GameLabelsSettings();
-            }
+            catch (Exception) { }
 
             Labels = settings.Labels.Select(label => new GameLabelSettingsViewModel(label, plugin.PlayniteApi)).ToObservable();
 
@@ -124,7 +129,22 @@ namespace GameLabels
 
             Settings.Labels = Labels.Select(x => x.GetLabel()).ToObservable();
 
-            plugin.SavePluginSettings(Settings);
+            var plop = Settings.Labels.Select(x => 
+            {
+                var conditionSerializer = x.Condition.Serializer;
+                
+                var serializeLabel = new SeriazableGameLabel
+                {
+                    BackgroundColor = x.BackgroundColor,
+                    Text = x.Text,
+                    TextColor = x.TextColor,
+                    ConditionSerializerName = conditionSerializer.GetType().FullName,
+                    ConditionArguments = conditionSerializer.Serialize(x.Condition)
+                };
+                return serializeLabel;
+            }).ToList();
+
+            plugin.SavePluginSettings(plop);
         }
 
         public bool VerifySettings(out List<string> errors)

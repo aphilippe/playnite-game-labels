@@ -9,11 +9,20 @@ namespace GameLabels.Conditions
 {
     public interface IGameLabelCondition
     {
+        IGameLabelConditionSerializer Serializer { get; }
         bool Test(Game game);
+    }
+
+    public interface IGameLabelConditionSerializer
+    {
+        Dictionary<string,  object> Serialize(IGameLabelCondition condition);
+        IGameLabelCondition Deserialize(Dictionary<string, object> serializedValue);
     }
 
     public class AlwaysTrueGameLabelCondition : IGameLabelCondition
     {
+        public IGameLabelConditionSerializer Serializer => throw new NotImplementedException();
+
         public bool Test(Game game)
         {
             return true;
@@ -21,6 +30,8 @@ namespace GameLabels.Conditions
     }
     public class AlwaysFalseGameLabelCondition : IGameLabelCondition
     {
+        public IGameLabelConditionSerializer Serializer => throw new NotImplementedException();
+
         public bool Test(Game game)
         {
             return false;

@@ -14,6 +14,8 @@ namespace GameLabels.Conditions
 
         public PropertyInfo PropertyInfo { get; }
 
+        public IGameLabelConditionSerializer Serializer => new GuidGameLabelConditionSerializer();
+
         public GuidGameLabelCondition(Guid guid, PropertyInfo propertyInfo)
         {
             Guid = guid;
@@ -24,6 +26,25 @@ namespace GameLabels.Conditions
         {
             var objects = PropertyInfo.GetValue(game, null) as IEnumerable<Guid>;
             return objects?.Contains(Guid) ?? false;
+        }
+    }
+
+    internal class GuidGameLabelConditionSerializer : IGameLabelConditionSerializer
+    {
+        public IGameLabelCondition Deserialize(Dictionary<string, object> serializedValue)
+        {
+            var property = typeof(Game).GetProperty(serializedValue["PropertyName"].ToString());
+            var guid = new Guid(serializedValue["Guid"].ToString());
+            return new GuidGameLabelCondition(guid, property);
+        }
+
+        public Dictionary<string, object> Serialize(IGameLabelCondition condition)
+        {
+            return new Dictionary<string, object>
+            {
+                    { "Guid", ((GuidGameLabelCondition)condition).Guid },
+                    { "PropertyName", ((GuidGameLabelCondition)condition).PropertyInfo.Name }
+            };
         }
     }
 }
