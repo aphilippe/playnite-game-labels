@@ -18,7 +18,21 @@ namespace GameLabels.Settings
         public string Text { get => label.Text; set { label.Text = value; } }
         public Brush BackgroundColor { get => label.BackgroundColor; set { label.BackgroundColor = value; } }
         public Brush TextColor { get => label.TextColor; set { label.TextColor = value; } }
-        public DatabaseObject DatabaseObject { get; set; }
+
+        private DatabaseObject databaseObject;
+        public DatabaseObject DatabaseObject { 
+            get
+            {
+                if (databaseObject != null)
+                {
+                    return databaseObject;
+                }
+
+                databaseObject = playniteAPI.Database.Tags.FirstOrDefault(x => x.Id == ((GuidGameLabelCondition)label.Condition).Guid);
+                return databaseObject;
+            }
+            set => databaseObject = value;
+        }
 
         private readonly GameLabel label;
         public IItemCollection Items { get; set; }
@@ -30,6 +44,11 @@ namespace GameLabels.Settings
             this.label = label;
             
             Items = playniteAPI.Database.Tags;
+
+            if (label.Condition is GuidGameLabelCondition)
+            {
+                DatabaseObject = playniteAPI.Database.Tags.FirstOrDefault(x => x.Id == ((GuidGameLabelCondition)label.Condition).Guid);
+            }
         }
 
         public GameLabel GetLabel() 
