@@ -28,7 +28,10 @@ namespace GameLabels.Settings
                     return databaseObject;
                 }
 
-                databaseObject = playniteAPI.Database.Tags.FirstOrDefault(x => x.Id == ((GuidGameLabelCondition)label.Condition).Guid);
+                if (label.Condition is GuidGameLabelCondition)
+                {
+                    DatabaseObject = playniteAPI.Database.Tags.FirstOrDefault(x => x.Id == ((GuidGameLabelCondition)label.Condition).Guid);
+                }
                 return databaseObject;
             }
             set => databaseObject = value;
@@ -45,10 +48,7 @@ namespace GameLabels.Settings
             
             Items = playniteAPI.Database.Tags;
 
-            if (label.Condition is GuidGameLabelCondition)
-            {
-                DatabaseObject = playniteAPI.Database.Tags.FirstOrDefault(x => x.Id == ((GuidGameLabelCondition)label.Condition).Guid);
-            }
+            
         }
 
         public GameLabel GetLabel() 

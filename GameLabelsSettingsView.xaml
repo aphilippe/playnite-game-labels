@@ -15,9 +15,11 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid>
-                        <TextBlock Text="{Binding Text}" Background="{Binding BackgroundColor}" Foreground="{Binding TextColor}" 
-                                    FontWeight="Bold"/>
-                        <ComboBox ItemsSource="{Binding Items}" SelectedItem="{Binding DatabaseObject}"/>
+                        <StackPanel  HorizontalAlignment="Left">
+                            <TextBox Text="{Binding Text}" Background="{Binding BackgroundColor}" Foreground="{Binding TextColor}" 
+                                        FontWeight="Bold"/>
+                            <ComboBox ItemsSource="{Binding Items}" SelectedItem="{Binding DatabaseObject}"/>
+                        </StackPanel>
                         <Button Content="X" HorizontalAlignment="Right"
                                 Command="{Binding DataContext.DeleteLabelCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" />
                     </Grid>
