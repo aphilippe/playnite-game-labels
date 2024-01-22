@@ -16,8 +16,24 @@ namespace GameLabels.Settings
     {
         private readonly IPlayniteAPI playniteAPI;
         public string Text { get => label.Text; set { label.Text = value; } }
-        public Brush BackgroundColor { get => label.BackgroundColor; set { label.BackgroundColor = value; } }
-        public Brush TextColor { get => label.TextColor; set { label.TextColor = value; } }
+        public Brush BackgroundColor
+        {
+            get => label.BackgroundColor; 
+            set
+            {
+                label.BackgroundColor = value;
+                OnPropertyChanged();
+            }
+        }
+        public Brush TextColor
+        {
+            get => label.TextColor; 
+            set
+            {
+                label.TextColor = value;
+                OnPropertyChanged();
+            }
+        }
 
         private DatabaseObject databaseObject;
         public DatabaseObject DatabaseObject { 
